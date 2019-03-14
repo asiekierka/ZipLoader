@@ -3524,7 +3524,6 @@ var PromiseLike = isPromiseSuppoted ? Promise : function PromiseLike(executor) {
 };
 
 var count = 0;
-var THREE;
 
 var ZipLoader =
 /*#__PURE__*/
@@ -3601,81 +3600,6 @@ function () {
       });
     }
   }, {
-    key: "extractAsBlobUrl",
-    value: function extractAsBlobUrl(filename, type) {
-      if (this.files[filename].url) {
-        return this.files[filename].url;
-      }
-
-      var blob = new Blob([this.files[filename].buffer], {
-        type: type
-      });
-      this.files[filename].url = URL.createObjectURL(blob);
-      return this.files[filename].url;
-    }
-  }, {
-    key: "extractAsText",
-    value: function extractAsText(filename) {
-      var buffer = this.files[filename].buffer;
-
-      if (typeof TextDecoder !== 'undefined') {
-        return new TextDecoder().decode(buffer);
-      }
-
-      var str = '';
-
-      for (var i = 0, l = buffer.length; i < l; i++) {
-        str += String.fromCharCode(buffer[i]);
-      }
-
-      return decodeURIComponent(escape(str));
-    }
-  }, {
-    key: "extractAsJSON",
-    value: function extractAsJSON(filename) {
-      return JSON.parse(this.extractAsText(filename));
-    }
-  }, {
-    key: "loadThreeJSON",
-    value: function loadThreeJSON(filename) {
-      var _this2 = this;
-
-      var json = this.extractAsJSON(filename);
-      var dirName = filename.replace(/\/.+\.json$/, '/');
-      var pattern = "__ziploader_".concat(this._id, "__");
-      var regex = new RegExp(pattern);
-
-      if (!THREE.Loader.Handlers.handlers.indexOf(regex) !== -1) {
-        THREE.Loader.Handlers.add(regex, {
-          load: function load(filename) {
-            return _this2.loadThreeTexture(filename.replace(regex, ''));
-          }
-        });
-      }
-
-      return THREE.JSONLoader.prototype.parse(json, pattern + dirName);
-    }
-  }, {
-    key: "loadThreeTexture",
-    value: function loadThreeTexture(filename) {
-      var texture = new THREE.Texture();
-      var type = /\.jpg$/.test(filename) ? 'image/jpeg' : /\.png$/.test(filename) ? 'image/png' : /\.gif$/.test(filename) ? 'image/gif' : undefined;
-      var blob = new Blob([this.files[filename].buffer], {
-        type: type
-      });
-
-      var onload = function onload() {
-        texture.needsUpdate = true;
-        texture.image.removeEventListener('load', onload);
-        URL.revokeObjectURL(texture.image.src);
-      };
-
-      texture.image = new Image();
-      texture.image.addEventListener('load', onload);
-      texture.image.src = URL.createObjectURL(blob);
-      return texture;
-    }
-  }, {
     key: "on",
     value: function on(type, listener) {
       if (!this._listeners[type]) {
@@ -3727,24 +3651,10 @@ function () {
       }
 
       delete this.files;
-
-      if (!!THREE) {
-        var pattern = "__ziploader_".concat(this._id, "__");
-        THREE.Loader.Handlers.handlers.some(function (el, i) {
-          if (el instanceof RegExp && el.source === pattern) {
-            THREE.Loader.Handlers.handlers.splice(i, 2);
-            return true;
-          }
-        });
-      }
     }
   }], [{
     key: "install",
-    value: function install(option) {
-      if (!!option.THREE) {
-        THREE = option.THREE;
-      }
-    }
+    value: function install(option) {}
   }]);
 
   return ZipLoader;
